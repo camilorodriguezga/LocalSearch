@@ -104,8 +104,38 @@ class LocalSearch(object):
 		return s, True
 
 	def improve(self, s, n):
+		eTotal = self.getTotalEventsPerArea(s)
+		eMaxForBlock = self.getMaximunEventsPerAreaEachBlock(s)
+		bTotal = self.getTotalBlocksAssignedToEventSameArea(s)
+
+		sCost = self.getCost(eTotal, eMaxForBlock, bTotal)
 		
+		for nk in n:
+			eTotal = self.getTotalEventsPerArea(nk)
+			eMaxForBlock = self.getMaximunEventsPerAreaEachBlock(nk)
+			bTotal = self.getTotalBlocksAssignedToEventSameArea(nk)
+			nk = self.getCost(eTotal, eMaxForBlock, bTotal)
+			if nk < sCost:
+				return nk
+
 		return None
+
+	def getCost(self, eTotal, eMaxForBlock, bTotal):
+		sCost = 0
+		for i in eTotal:
+			sCost = bTotal[i] * eTotal[i] / eMaxForBlock[i]
+		return sCost
+
+	def getTotalEventsPerArea(self, s):
+		return {"CB": 2, "ING": 3}
+
+	def getMaximunEventsPerAreaEachBlock(self, s):
+		# maximun number event per area
+		return {"CB": 2, "ING": 3}
+
+	def getTotalBlocksAssignedToEventSameArea(self, s):
+		# area and total number of blocks
+		return {"CB":2, "ING":5}
 
 	def show(self, s):
 		print s
