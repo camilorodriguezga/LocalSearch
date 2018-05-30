@@ -1,4 +1,5 @@
 import random
+import copy as cp
 
 class TimeTabling:
 	event   = ""
@@ -16,14 +17,26 @@ class TimeTabling:
 		self.area = a
 		self.slot = s
 
+	def __repr__(self):
+		return "{event : %s, area : %s, block : %s,  slot : %s-%s} \n" % (self.getEvent(), self.getArea(), self.getBlock(), self.getSlot()[0], self.getSlot()[1])
+
+	def __str__(self):
+		return "{event : %s, area : %s, block : %s }" % (self.getEvent(), self.getArea(), self.getBlock())
+
 	def getEvent(self):
 		return self.event
+
+	def getRoom(self):
+		return self.room
 
 	def getSlot(self):
 		return self.slot
 
 	def getArea(self):
 		return self.area
+
+	def getBlock (self):
+		return self.block
  
 	def setEvent (self, e):
 		self.event = e
@@ -51,13 +64,14 @@ class LocalSearch(object):
 
 	def build(self):
 
-		s = self.s0
+		s2 = self.s0
 		while True:
-			n = self.getNeighbors(s)
-			s = self.improve(s, n)
-			if s == None:
+			s1 = s2
+			n = self.getNeighbors(s1)
+			s2 = self.improve(s1, n)
+			if s2 == None:
 				break
-		self.show(s)
+		self.show(s1)
 
 	def getNeighbors(self, s):
 		
@@ -74,13 +88,16 @@ class LocalSearch(object):
 
 		r1 = random.randint(0, len(s)-1)
 		ts = s[r1].getSlot()[1] - s[r1].getSlot()[0]
+		#TODO validate room is bad and insert is bad 
 
 		for i in range(0, len(s) - 1):
 			tsi = s[i].getSlot()[1] - s[i+1].getSlot()[0]
 			if tsi != 0 and ts <= tsi:
+				#TODO is bad
 				temp = s[ts]
 				s.remove(temp)
 				s.insert(i, temp)
+				print "entro"
 				return s
 
 		return None
@@ -109,7 +126,6 @@ class LocalSearch(object):
 		bTotal = self.getTotalBlocksAssignedToEventSameArea(s)
 
 		sCost = self.getCost(eTotal, eMaxForBlock, bTotal)
-		
 		for nk in n:
 			eTotal = self.getTotalEventsPerArea(nk)
 			eMaxForBlock = self.getMaximunEventsPerAreaEachBlock(nk)
@@ -127,28 +143,61 @@ class LocalSearch(object):
 		return sCost
 
 	def getTotalEventsPerArea(self, s):
-		return {"CB": 2, "ING": 3}
+
+		totalE = {}
+		sc = cp.copy(s)
+
+		while sc:
+			totalE[sc[0].getArea()] = len(filter(lambda i: i.getArea() == sc[0].getArea(), sc))
+			sc = [i for i in sc if i.getArea() != sc[0].getArea()]
+
+		return totalE
 
 	def getMaximunEventsPerAreaEachBlock(self, s):
-		# maximun number event per area
-		return {"CB": 2, "ING": 3}
+
+		totalE = {}
+		sc = cp.copy(s)
+
+		while sc:
+			eventForArea = filter(lambda i: i.getArea() == sc[0].getArea(), sc)
+			# te: total event for area and block
+			te = []
+			while eventForArea:
+				te.append(len(filter(lambda i: i.getBlock() == eventForArea[0].getBlock(), eventForArea)))
+				# remove items counted
+				eventForArea = [i for i in eventForArea if i.getBlock() != eventForArea[0].getBlock()]
+			# set the maximun number events for area block 
+			totalE[sc[0].getArea()] = max(te)
+			# remove items counted
+			sc = [i for i in sc if i.getArea() != sc[0].getArea()]
+		
+		return totalE
 
 	def getTotalBlocksAssignedToEventSameArea(self, s):
-		# area and total number of blocks
-		return {"CB":2, "ING":5}
+		totalE = {}
+		sc = cp.copy(s)
+
+		while sc:
+			ev = filter(lambda i: i.getArea() == sc[0].getArea(), sc)
+			# get the total number of block for area in each ev
+			totalE[sc[0].getArea()] = len({x.getBlock():ev.count(x) for x in ev})
+			sc = [i for i in sc if i.getArea() != sc[0].getArea()]
+		return totalE
 
 	def show(self, s):
 		print s
 
 
 if __name__ == '__main__':
-	t1 = TimeTabling("mate1", "s1", "b1", "L", "CB", (6, 8))
+	t1 = TimeTabling("mate2", "s1", "b3", "L", "CB", (6, 8))
+
 	t2 = TimeTabling("progr", "s1", "b1", "L", "ING", (8, 10))
 	t3 = TimeTabling("mate1", "s1", "b1", "L", "CB", (10, 12))
-	t4 = TimeTabling("mate1", "s1", "b1", "L", "CB", (14, 16))
-	t5 = TimeTabling("mate1", "s2", "b2", "L", "CB", (12, 14))
-	t6 = TimeTabling("mate1", "s2", "b2", "L", "CB", (12, 14))
-	t7 = TimeTabling("mate1", "s2", "b2", "L", "CB", (12, 14))
-	swap = [t1, t2, t3, t4, t5]
-	nmax = 10
+	
+	t4 = TimeTabling("mate1", "s1", "b2", "L", "CB", (14, 16))
+	t5 = TimeTabling("mate1", "s2", "b2", "L", "CB", (13, 14))
+	t6 = TimeTabling("mate1", "s2", "b2", "L", "CB", (8, 9))
+	t7 = TimeTabling("mate1", "s2", "b2", "L", "CB", (6, 8))
+	swap = [t1, t2, t3, t4, t5, t6, t7]
+	nmax = 1
 	LocalSearch(swap, nmax).build()
