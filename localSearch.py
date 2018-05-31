@@ -1,7 +1,7 @@
 from basefile import BaseFile
 from timetablingmodel import TimeTablingModel
 
-import copy as cp
+from copy import deepcopy
 import random
 import sys
 
@@ -20,20 +20,22 @@ class LocalSearch(object):
 	  s2 = self.improve(s1, n)
 	  if s2 == None:
 		break
-	self.show(s1)
+	  else :
+	  	self.show(s2)
 
   def getNeighbors(self, s):
 	n = []
+	sc = deepcopy(s)
 	for i in range(0, self.nmax):
-	  ni = self.insertAndDelete(s)
+	  ni = self.insertAndDelete(sc)
 	  if ni == None:
-		ni = self.swap(s)
+		ni = self.swap(sc)
 	  n.append(ni)
 	return n
 
   def insertAndDelete(self, s):
 	r1 = random.randint(0, len(s)-1)
-	sc = cp.copy(s)
+	sc = deepcopy(s)
 	sc = [i for i in sc if i.room != sc[r1].room]
 	while sc:
 	  er = filter(lambda i: i.room == sc[0].room, sc)
@@ -69,8 +71,8 @@ class LocalSearch(object):
   def improve(self, s, n):
 	sCost = self.getCost(s)
 	for nk in n:
-	  nk = self.getCost(nk)
-	  if nk < sCost:
+	  nkCost = self.getCost(nk)
+	  if nkCost < sCost:
 		return nk
 	return None
 
@@ -85,7 +87,7 @@ class LocalSearch(object):
 
   def getTotalEventsPerArea(self, s):
 	totalE = {}
-	sc = cp.copy(s)
+	sc = deepcopy(s)
 	while sc:
 	  totalE[sc[0].area] = len(filter(lambda i: i.area == sc[0].area, sc))
 	  sc = [i for i in sc if i.area != sc[0].area]
@@ -93,7 +95,7 @@ class LocalSearch(object):
 
   def getMaximunEventsPerAreaEachBlock(self, s):
 	totalE = {}
-	sc = cp.copy(s)
+	sc = deepcopy(s)
 	while sc:
 	  eventForArea = filter(lambda i: i.area == sc[0].area, sc)
 	  # te: total event for area and block
@@ -111,7 +113,7 @@ class LocalSearch(object):
 
   def getTotalBlocksAssignedToEventSameArea(self, s):
 	totalE = {}
-	sc = cp.copy(s)
+	sc = deepcopy(s)
 	while sc:
 	  ev = filter(lambda i: i.area == sc[0].area, sc)
 	  # get the total number of block for area in each ev
@@ -123,7 +125,7 @@ class LocalSearch(object):
 	print "min z =",self.getCost(s), "\n", s
 
 if __name__ == '__main__':
-  nameFile = "data/timetabling1.csv"
+  nameFile = "data/timetabling2.csv"
   nmax = 100
   if len(sys.argv) > 1:
     nameFile = "data/" + sys.argv[1]
