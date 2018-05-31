@@ -1,0 +1,9 @@
+.idea
+Icon\r
+*.aux
+*.out
+*.log
+*.fdb_latexmk
+*.gz
+*.fls
+*.pyc
