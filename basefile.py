@@ -1,4 +1,4 @@
-from timeTablingModel import TimeTablingModel
+from timetablingmodel import TimeTablingModel
 
 import sys
 

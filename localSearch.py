@@ -1,5 +1,5 @@
 from basefile import BaseFile
-from timeTablingModel import TimeTablingModel
+from timetablingmodel import TimeTablingModel
 
 import copy as cp
 import random
