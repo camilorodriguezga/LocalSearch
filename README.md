@@ -2,19 +2,12 @@
 
 Camilo Andrés Rodríguez Garzón
 
-This is an implementation of the TimeTabling problem.
+This is an implementation of Local Search for solved TimeTabling problem.
 
 Requirements
 ------------
 - [copy](https://docs.python.org/2/library/copy.html)
 - [matplotlib](https://matplotlib.org/)
-
-Install for linux
--------
-
-```
-   sudo make install
-```
 
 ### Testing
 
@@ -51,6 +44,10 @@ You can run of basic example with:
    make
    
    make local_search
+
+   make file="namefile.extension"
+
+   make file="namefile.extension"  neighbors="numberneighbors"
 
 ```
 
