@@ -2,6 +2,8 @@ from basefile import BaseFile
 from timetablingmodel import TimeTablingModel
 
 from copy import deepcopy
+import matplotlib.pyplot as plt
+import numpy as np
 import random
 import sys
 
@@ -13,7 +15,8 @@ class LocalSearch(object):
 
   def build(self):
     s2 = self.s0
-    self.show(s2)
+    rs = []
+    self.show(rs, s2)
     while True:
       s1 = s2
       n = self.getNeighbors(s1)
@@ -21,7 +24,7 @@ class LocalSearch(object):
       if s2 == None:
         break
       else :
-        self.show(s2)
+        self.show(rs, s2)
 
   def getNeighbors(self, s):
     n = []
@@ -121,15 +124,32 @@ class LocalSearch(object):
       sc = [i for i in sc if i.area != sc[0].area]
     return totalE
 
-  def show(self, s):
-    print "min z =",self.getCost(s), "\n", s
+  def draw(self, sd):
+    x = np.array(sd)
+    plt.cla()
+    """scatter set point in the cordenates x,x"""
+    plt.scatter(x[:], x[:], s=100, c='k')
+    """beeline with coordinate x, x"""
+    plt.plot(x, x, 'r-')
+    """draw coordinate plane with x between -0.1,4 and x -0.1,4"""
+    plt.xlim((-max(x)/10, max(x)+(max(x)/10)))
+    plt.ylim((-max(x)/10, max(x)+(max(x)/10)))
+    plt.pause(0.01)
+
+  def show(self, rs, s):
+    c = self.getCost(s)
+    rs.append(c)
+    self.draw(rs)
+    print "min z =",c, "\n", s
 
 if __name__ == '__main__':
   nameFile = "data/timetabling2.csv"
-  nmax = 100
+  nmax = 150
   if len(sys.argv) > 1:
     nameFile = "data/" + sys.argv[1]
   if len(sys.argv) > 2:
     nmax = int(sys.argv[2])
   swap = BaseFile().getContent(nameFile)
   LocalSearch(swap, nmax).build()
+  plt.ioff()
+  plt.show()
