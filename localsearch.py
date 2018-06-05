@@ -10,13 +10,14 @@ import sys
 class LocalSearch(object):
   def __init__(self, s0, nmax):
     super(LocalSearch, self).__init__()
+    plt.ion()
     self.s0 = s0
     self.nmax = nmax
 
   def build(self):
     s2 = self.s0
     rs = []
-    self.show(rs, s2)
+    self.show(rs, s2, False)
     while True:
       s1 = s2
       n = self.getNeighbors(s1)
@@ -24,7 +25,7 @@ class LocalSearch(object):
       if s2 == None:
         break
       else :
-        self.show(rs, s2)
+        self.show(rs, s2, True)
 
   def getNeighbors(self, s):
     n = []
@@ -134,17 +135,20 @@ class LocalSearch(object):
     """draw coordinate plane with x between -0.1,4 and x -0.1,4"""
     plt.xlim((-max(x)/10, max(x)+(max(x)/10)))
     plt.ylim((-max(x)/10, max(x)+(max(x)/10)))
+    fig.savefig('img/out.png')
     plt.pause(0.01)
 
-  def show(self, rs, s):
+  def show(self, rs, s, isDraw):
     c = self.getCost(s)
     rs.append(c)
-    self.draw(rs)
+    if isDraw:
+      self.draw(rs)
     print "min z =",c, "\n", s
 
 if __name__ == '__main__':
   nameFile = "data/timetabling2.csv"
   nmax = 150
+  fig = plt.figure()
   if len(sys.argv) > 1:
     nameFile = "data/" + sys.argv[1]
   if len(sys.argv) > 2:

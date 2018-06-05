@@ -33,7 +33,7 @@ you can add the following entries to the program with the following order in min
 python localsearch.py
 ```
 
-![alt text](https://github.com/camilorodriguezga/LocalSearch/blob/master/img/costTimeTabling.png)
+![alt text](https://github.com/camilorodriguezga/LocalSearch/blob/master/img/out.png)
 
 Run
 -------
