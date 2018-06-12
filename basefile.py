@@ -12,7 +12,7 @@ class BaseFile(object):
   	count = 1
   	with content as fp:
   	  for line in fp:
-  	  	data = line.split(",")
+  	  	data = line.split(";")
   	  	s.append(TimeTablingModel(data[0], data[1], data[2], data[3], 
   	  		data[4], (int(data[5]),int(data[6]))))
   	return s

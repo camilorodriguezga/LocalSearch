@@ -2,6 +2,7 @@ from basefile import BaseFile
 from timetablingmodel import TimeTablingModel
 
 from copy import deepcopy
+import datetime as date
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -15,9 +16,11 @@ class LocalSearch(object):
     self.nmax = nmax
 
   def build(self):
+    print "init date: " + str(date.datetime.now())
     s2 = self.s0
     rs = []
-    self.show(rs, s2, False)
+    r = 0
+    self.show(rs, s2, 0, False)
     while True:
       s1 = s2
       n = self.getNeighbors(s1)
@@ -25,12 +28,14 @@ class LocalSearch(object):
       if s2 == None:
         break
       else :
-        self.show(rs, s2, True)
+        r += 1
+        self.show(rs, s2, r, True)
+    print "end date: " + str(date.datetime.now())
 
   def getNeighbors(self, s):
     n = []
-    sc = deepcopy(s)
     for i in range(0, self.nmax):
+      sc = deepcopy(s)
       ni = self.insertAndDelete(sc)
       if ni == None:
         ni = self.swap(sc)
@@ -51,26 +56,27 @@ class LocalSearch(object):
       sc = [i for i in sc if i.room != sc[0].room]
     return None
 
-  def swap(self, s):    
+  def swap(self, s):
+    sc = deepcopy(s)    
     while True:
-      r1 = random.randint(0, len(s)-1)
-      r2 = random.randint(0, len(s)-1)
+      r1 = random.randint(0, len(sc)-1)
+      r2 = random.randint(0, len(sc)-1)
       while r1 == r2:
-        r2 = random.randint(0, len(s)-1)
-      if (s[r1].block != s[r2].block 
-        and s[r1].slot[1] - s[r1].slot[0] == s[r2].slot[1] - s[r2].slot[0]):
+        r2 = random.randint(0, len(sc)-1)
+      if (sc[r1].block != sc[r2].block
+        and sc[r1].slot[1] - sc[r1].slot[0] == sc[r2].slot[1] - sc[r2].slot[0]):
         temp = []
-        temp.insert(0, s[r2].room)
-        temp.insert(1, s[r2].block)
-        temp.insert(2, s[r2].slot)
-        s[r2].room = s[r1].room
-        s[r2].block = s[r1].block
-        s[r2].slot = s[r1].slot
-        s[r1].room = temp[0]
-        s[r1].block = temp[1]
-        s[r1].slot = temp[2]
+        temp.insert(0, sc[r2].room)
+        temp.insert(1, sc[r2].block)
+        temp.insert(2, sc[r2].slot)
+        sc[r2].room = sc[r1].room
+        sc[r2].block = sc[r1].block
+        sc[r2].slot = sc[r1].slot
+        sc[r1].room = temp[0]
+        sc[r1].block = temp[1]
+        sc[r1].slot = temp[2]
         break
-    return s
+    return sc
 
   def improve(self, s, n):
     sCost = self.getCost(s)
@@ -84,9 +90,9 @@ class LocalSearch(object):
     sCost = 0
     eTotal = self.getTotalEventsPerArea(s)
     eMaxForBlock = self.getMaximunEventsPerAreaEachBlock(s)
-    bTotal = self.getTotalBlocksAssignedToEventSameArea(s)  
+    bTotal = self.getTotalBlocksAssignedToEventSameArea(s)
     for i in eTotal:
-      sCost = (bTotal[i] * eTotal[i] / eMaxForBlock[i] ) + sCost
+      sCost = (bTotal[i] * (eTotal[i] / float(eMaxForBlock[i])) ) + sCost
     return sCost
 
   def getTotalEventsPerArea(self, s):
@@ -138,16 +144,16 @@ class LocalSearch(object):
     fig.savefig('img/out.png')
     plt.pause(0.01)
 
-  def show(self, rs, s, isDraw):
+  def show(self, rs, s, r, isDraw):
     c = self.getCost(s)
     rs.append(c)
     if isDraw:
       self.draw(rs)
-    print "min z =",c, "\n", s
+    print "min z =",c, " i =", r, "\n"
 
 if __name__ == '__main__':
-  nameFile = "data/timetabling2.csv"
-  nmax = 150
+  nameFile = "data/in1.csv"
+  nmax = 20
   fig = plt.figure()
   if len(sys.argv) > 1:
     nameFile = "data/" + sys.argv[1]
